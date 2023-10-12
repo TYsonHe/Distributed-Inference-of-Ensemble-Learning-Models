@@ -1,6 +1,7 @@
-import requests
 import threading
 import time
+
+import requests
 import yaml
 
 
@@ -107,6 +108,8 @@ class EnsembleModel:
             modelName:模型名字
             predictValue:模型的预测结果
         '''
+        # 清空results
+        self.results = []
         # 创建线程列表
         modelNum = len(self.urlDictList)
         threads = []
