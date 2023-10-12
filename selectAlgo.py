@@ -1,18 +1,10 @@
 from utils.EnsembleModel import EnsembleModel
-import pandas as pd
-import numpy as np
+from utils.DataLoader import DataLoader
 
-# 读入数据,并将数据转换为字符串类型
-inputDatas = pd.read_csv('testDataSets/X_test.csv')
-inputDatas = np.array(inputDatas)
-inputDatas = inputDatas.tolist()
-inputDatas_str = [','.join(map(str, row)) for row in inputDatas]
-
-
-yLabels = pd.read_csv('testDataSets/y_test.csv')
-yLabels = np.array(yLabels)
-yLabels = yLabels.tolist()
-yLabels = [float(i[0]) for i in yLabels]
+dataloader = DataLoader('testDataSets/X_test.csv', 'testDataSets/y_test.csv')
+dataloader.loadX()
+dataloader.loadY()
+inputDatas_str, yLabels = dataloader.shuffle()
 
 # 创建集成模型
 ensembleModel = EnsembleModel('configs/models.yml')
@@ -39,6 +31,9 @@ for i in range(0, len(inputDatas_str), detectRound):
     curInputDatas_str = inputDatas_str[i:i+detectRound]
     curYLabels = yLabels[i:i+detectRound]
     curModelsNum = ensembleModel.getModelsNum()
+    # 中间结果清空
+    curRoundModelsResults = []
+    curRoundEnsembleResults = []
 
     # 预测结果
     for j in range(detectRound):
