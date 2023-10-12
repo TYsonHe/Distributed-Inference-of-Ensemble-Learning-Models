@@ -1,0 +1,9 @@
+urlDictList:
+  - modelName: linear-regrssion
+    modelUrl: http://admin:MXPFQPduiKut@127.0.0.1:31112/function/linear-regression
+  - modelName: support-vector-machine
+    modelUrl: http://admin:MXPFQPduiKut@127.0.0.1:31112/function/svr
+  - modelName: random-forest
+    modelUrl: http://admin:MXPFQPduiKut@127.0.0.1:31112/function/rf
+  - modelName: lstm
+    modelUrl: http://admin:MXPFQPduiKut@127.0.0.1:31112/function/lstm
