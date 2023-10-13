@@ -1,5 +1,5 @@
-from utils.EnsembleModel import EnsembleModel
 from utils.DataLoader import DataLoader
+from utils.EnsembleModel import EnsembleModel
 
 dataloader = DataLoader('testDataSets/X_test.csv', 'testDataSets/y_test.csv')
 dataloader.loadX()
@@ -24,12 +24,12 @@ curRoundEnsembleResults = []
 preRoundError = 0x3f3f3f3f  # 上一轮的平均误差,初始值为一个很大的数
 
 isPreDelete = False  # 上一轮是否删除了模型
-preDeltedUrlDict = dict()
+preDeletedUrlDict = dict()
 
 for i in range(0, len(inputDatas_str), detectRound):
     # 读入7个数据
-    curInputDatas_str = inputDatas_str[i:i+detectRound]
-    curYLabels = yLabels[i:i+detectRound]
+    curInputDatas_str = inputDatas_str[i:i + detectRound]
+    curYLabels = yLabels[i:i + detectRound]
     curModelsNum = ensembleModel.getModelsNum()
     # 中间结果清空
     curRoundModelsResults = []
@@ -37,11 +37,11 @@ for i in range(0, len(inputDatas_str), detectRound):
 
     # 预测结果
     for j in range(detectRound):
-        results, ensembelPredictValue = ensembleModel.run(curInputDatas_str[j])
+        results, ensemblePredictValue = ensembleModel.run(curInputDatas_str[j])
         curRoundModelsResults.append(results)
-        curRoundEnsembleResults.append(ensembelPredictValue)
+        curRoundEnsembleResults.append(ensemblePredictValue)
         totalModelsResults.append(results)
-        totalEnsembleResults.append(ensembelPredictValue)
+        totalEnsembleResults.append(ensemblePredictValue)
 
     # 计算一轮中每个模型的平均误差
     curRoundModelError = dict()
@@ -54,7 +54,7 @@ for i in range(0, len(inputDatas_str), detectRound):
         print(curRoundModelsResults[0][j]
               ['modelName'], "的平均误差为:", curModelError)
         curRoundModelError[curRoundModelsResults[0][j]
-                           ['modelName']] = curModelError
+        ['modelName']] = curModelError
 
     # 计算一轮中集成模型的平均误差
     curEnsembleError = 0
@@ -75,7 +75,7 @@ for i in range(0, len(inputDatas_str), detectRound):
                            == curRoundModelsResults[0][j]['modelName']][0]
                 ensembleModel.deleteModel(urlDict)
                 isPreDelete = True
-                preDeltedUrlDict = urlDict
+                preDeletedUrlDict = urlDict
                 break
         # 展示当前模型
         ensembleModel.showCurrentModels()
@@ -89,7 +89,7 @@ for i in range(0, len(inputDatas_str), detectRound):
             preRoundError = curEnsembleError
         else:
             print("恢复更改")
-            ensembleModel.addModel(preDeltedUrlDict)
+            ensembleModel.addModel(preDeletedUrlDict)
             ensembleModel.showCurrentModels()
             isPreDelete = False
             preRoundError = curEnsembleError
