@@ -65,7 +65,8 @@ for i in range(0, len(inputDatas_str), detectRound):
     print("集成模型的平均误差为:", curEnsembleError)
 
     # 如果上一轮没有删除模型,则删除表现最差的模型
-    if not isPreDelete:
+    # 还不能删除最后一个模型
+    if not isPreDelete and curModelsNum > 1:
         for j in range(curModelsNum):
             if curRoundModelError[curRoundModelsResults[0][j]['modelName']] == max(curRoundModelError.values()):
                 print("删除模型:", curRoundModelsResults[0][j]['modelName'])
