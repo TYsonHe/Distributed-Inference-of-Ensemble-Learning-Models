@@ -1,9 +1,9 @@
 import yaml
 
-from Cadvisor import Cadvisor
-from KubeStateMetrics import KubeStateMetrics
-from NodeExporter import NodeExporter
-from PrometheusManager import PrometheusManager
+from utils.MonitorCenter.Cadvisor import Cadvisor
+from utils.MonitorCenter.KubeStateMetrics import KubeStateMetrics
+from utils.MonitorCenter.NodeExporter import NodeExporter
+from utils.MonitorCenter.PrometheusManager import PrometheusManager
 
 
 class MonitorCenter:
@@ -19,7 +19,9 @@ class MonitorCenter:
         with open(self.configPath, 'r') as f:
             monitorCenterConfig = yaml.load(f, Loader=yaml.FullLoader)
         self.prometheusGateway = monitorCenterConfig['prometheusGateway']
-        self.OpenFaaSGateway = monitorCenterConfig['openFaaSGateway']
+        self.openFaaSGateway = monitorCenterConfig['openFaaSGateway']
+        self.openFaaSUser = monitorCenterConfig['openFaaSBasicAuth']['user']
+        self.openFaaSPassword = monitorCenterConfig['openFaaSBasicAuth']['password']
 
 
 # test

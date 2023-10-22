@@ -1,7 +1,7 @@
 import time
 from statistics import mean
 
-from PrometheusManager import PrometheusManager, PrometheusCannotQuery
+from utils.MonitorCenter.PrometheusManager import PrometheusManager, PrometheusCannotQuery
 
 
 # 对应Cadvisor的接口,监控容器级别的资源信息
@@ -53,7 +53,7 @@ class Cadvisor:
     def getMemRateTimely(self, pod: str, end: float):
         query = 'sum(container_memory_usage_bytes{{pod=~"^{pod}.*"}} ' \
                 '/ container_memory_max_usage_bytes{{pod=~"^{pod}.*"}})/2'.format(
-            pod=pod)
+                    pod=pod)
         response = self.promManager.queryRange(query, end)['data'][0]['values']
         average_mem = mean([float(record[1]) for record in response])
         return average_mem, [[record[0], float(record[1])] for record in response]

@@ -1,4 +1,4 @@
-from PrometheusManager import PrometheusManager
+from utils.MonitorCenter.PrometheusManager import PrometheusManager
 
 
 # 对应kube-state-metrics的接口,监控集群级别(k8s集群)的资源信息

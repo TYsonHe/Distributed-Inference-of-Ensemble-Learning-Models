@@ -1,4 +1,7 @@
 openFaaSGateway: 10.60.150.177:31112
+openFaaSBasicAuth:
+  user: admin
+  password: admin
 prometheusGateway: 10.60.150.177:31119
 db:
   version: MySQL
