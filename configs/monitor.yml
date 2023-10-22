@@ -1,0 +1,10 @@
+openFaaSGateway: 10.60.150.177:31112
+prometheusGateway: 10.60.150.177:31119
+db:
+  version: MySQL
+  host: 10.60.150.177
+  port: 3306
+  user: root
+  password: root
+  database: modeldb
+  charset: utf8
