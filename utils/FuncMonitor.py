@@ -24,16 +24,33 @@ class FuncMonitor:
         return response.json()['invocationCount']
 
     def getFuncRequestTotal(self, funcName):
-        pass
+        '''
+        Get the total number of requests of a function
+        '''
+        query = 'gateway_function_requests_total{{function_name=~"{funcName}\\\\..*"}}'.format(
+            funcName=funcName)
+        res = self.monitorCenter.promManager.query(
+            query)['data'][0]['value'][1]
+        return res
 
     def getFuncColdStartCount(self, funcName):
         """
         Get the cold start counts of a function
         """
-        pass
+        query = 'gateway_function_cold_start_seconds_count{{function_name=~"{funcName}\\\\..*"}}'.format(
+            funcName=funcName)
+        print(query)
+        res = self.monitorCenter.promManager.query(
+            query)['data'][0]['value'][1]
+        return res
 
     def getFuncAvgColdStartTime(self, funcName):
         """
         Get the average cold start time of a function
         """
-        pass
+        function_name_pattern = funcName+"\\\\..*"
+        query = 'gateway_function_cold_start_seconds_sum{{function_name=~"{0}"}} / gateway_function_cold_start_seconds_count{{function_name=~"{0}"}}'.format(
+            function_name_pattern)
+        res = self.monitorCenter.promManager.query(
+            query)['data'][0]['value'][1]
+        return res

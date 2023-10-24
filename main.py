@@ -8,3 +8,6 @@ if __name__ == "__main__":
     funcMonitor = FuncMonitor(monitorCenter)
     funcList = funcMonitor.getFuncList()
     print(funcList)
+    print(funcMonitor.getFuncRequestTotal('nodeinfo'))
+    print(funcMonitor.getFuncColdStartCount('nodeinfo'))
+    print(funcMonitor.getFuncAvgColdStartTime('nodeinfo'))
