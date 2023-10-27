@@ -17,21 +17,18 @@ class FuncMonitor:
         return funcList
 
     def getFuncReplicas(self, funcName):
-        url = 'http://'+self.monitorCenter.openFaaSGateway + '/system/function/'+funcName
-        headers = {"Content-Type": "application/json"}
-        response = requests.get(url, auth=(
-            self.monitorCenter.openFaaSUser, self.monitorCenter.openFaaSPassword), headers=headers)
-        if 'replicas' in response.json():
-            return response.json()['replicas']
-        else:
-            return 0
+        query = 'gateway_service_count{{function_name=~"{funcName}\\\\..*"}}'.format(
+            funcName=funcName)
+        res = self.monitorCenter.promManager.query(
+            query)['data'][0]['value'][1]
+        return res
 
     def getFuncInvocationTotal(self, funcName):
-        url = 'http://'+self.monitorCenter.openFaaSGateway + '/system/function/'+funcName
-        headers = {"Content-Type": "application/json"}
-        response = requests.get(url, auth=(
-            self.monitorCenter.openFaaSUser, self.monitorCenter.openFaaSPassword), headers=headers)
-        return response.json()['invocationCount']
+        query = 'sum (gateway_function_invocation_total{{function_name=~"{funcName}\\\\..*"}})'.format(
+            funcName=funcName)
+        res = self.monitorCenter.promManager.query(
+            query)['data'][0]['value'][1]
+        return res
 
     def getFuncInvocationRange(self, funcName, timeRange: str):
         '''

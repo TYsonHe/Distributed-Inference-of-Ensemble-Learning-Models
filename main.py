@@ -9,6 +9,7 @@ if __name__ == "__main__":
     funcList = funcMonitor.getFuncList()
     print(funcList)
     print(funcMonitor.getFuncReplicas('nodeinfo'))
+    print(funcMonitor.getFuncInvocationTotal('nodeinfo'))
     print(funcMonitor.getFuncInvocationRange('nodeinfo', '30m'))
     print(funcMonitor.getFuncRequestRange('nodeinfo', '30m'))
     print(funcMonitor.getFuncAvgColdStartTimeRange('nodeinfo', '30m'))
