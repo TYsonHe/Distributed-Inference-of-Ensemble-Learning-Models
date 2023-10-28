@@ -30,13 +30,17 @@ class FuncMonitor:
             query)['data'][0]['value'][1]
         return res
 
-    def getFuncInvocationRange(self, funcName, timeRange: str):
+    def getFuncInvocationRange(self, funcName, timeRange: str, is_offset=False, offset=''):
         '''
         Get the invocation count of a function in a time range
         time range example: 1s 1h 30m 1d
         '''
-        query = 'increase(gateway_function_invocation_total{{function_name=~"{funcName}\\\\..*"}}[{timeRange}])'.format(
+        query = 'increase(gateway_function_invocation_total{{function_name=~"{funcName}\\\\..*"}}[{timeRange}]'.format(
             funcName=funcName, timeRange=timeRange)
+        if is_offset:
+            query = query + ' offset ' + str(offset)
+        query = query + ')'
+        # print(query)
         res = self.monitorCenter.promManager.query(
             query)['data'][0]['value'][1]
         return res
@@ -51,13 +55,16 @@ class FuncMonitor:
             query)['data'][0]['value'][1]
         return res
 
-    def getFuncRequestRange(self, funcName, timeRange: str):
+    def getFuncRequestRange(self, funcName, timeRange: str, is_offset=False, offset=''):
         '''
         Get the total number of requests of a function in a time range
         time range example: 1s 1h 30m 1d
         '''
-        query = 'increase(gateway_function_requests_total{{function_name=~"{funcName}\\\\..*"}}[{timeRange}])'.format(
+        query = 'increase(gateway_function_requests_total{{function_name=~"{funcName}\\\\..*"}}[{timeRange}]'.format(
             funcName=funcName, timeRange=timeRange)
+        if is_offset:
+            query = query + ' offset ' + str(offset)
+        query = query + ')'
         res = self.monitorCenter.promManager.query(
             query)['data'][0]['value'][1]
         return res
@@ -72,13 +79,16 @@ class FuncMonitor:
             query)['data'][0]['value'][1]
         return res
 
-    def getFuncColdStartCountRange(self, funcName, timeRange: str):
+    def getFuncColdStartCountRange(self, funcName, timeRange: str, is_offset=False, offset=''):
         '''
         Get the cold start counts of a function in a time range
         time range example: 1s 1h 30m 1d
         '''
-        query = 'increase(gateway_function_cold_start_seconds_count{{function_name=~"{funcName}\\\\..*"}}[{timeRange}])'.format(
+        query = 'increase(gateway_function_cold_start_seconds_count{{function_name=~"{funcName}\\\\..*"}}[{timeRange}]'.format(
             funcName=funcName, timeRange=timeRange)
+        if is_offset:
+            query = query + ' offset ' + str(offset)
+        query = query + ')'
         res = self.monitorCenter.promManager.query(
             query)['data'][0]['value'][1]
         return res
@@ -94,7 +104,7 @@ class FuncMonitor:
             query)['data'][0]['value'][1]
         return res
 
-    def getFuncAvgColdStartTimeRange(self, funcName, timeRange: str):
+    def getFuncAvgColdStartTimeRange(self, funcName, timeRange: str, is_offset=False, offset=''):
         """
         Get the average cold start time of a function in a time range
         time range example: 1s 1h 30m 1d
@@ -102,6 +112,9 @@ class FuncMonitor:
         function_name_pattern = funcName+"\\\\..*"
         query = 'increase(gateway_function_cold_start_seconds_sum{{function_name=~"{0}"}}[{1}]) / increase(gateway_function_cold_start_seconds_count{{function_name=~"{0}"}}[{1}])'.format(
             function_name_pattern, timeRange)
+        if is_offset:
+            query = 'increase(gateway_function_cold_start_seconds_sum{{function_name=~"{0}"}}[{1}] offset {2}) / increase(gateway_function_cold_start_seconds_count{{function_name=~"{0}"}}[{1}] offset {2})'.format(
+                function_name_pattern, timeRange, offset)
         # print(query)
         res = self.monitorCenter.promManager.query(
             query)['data'][0]['value'][1]
@@ -119,13 +132,16 @@ class FuncMonitor:
             query)['data'][0]['value'][1]
         return res
 
-    def getFuncInFlightRange(self, funcName, timeRange: str):
+    def getFuncInFlightRange(self, funcName, timeRange: str, is_offset=False, offset=''):
         '''
         Get the in-flight requests of a function in a time range
         time range example: 1s 1h 30m 1d
         '''
-        query = 'increase(gateway_function_in_flight{{function_name=~"{funcName}\\\\..*"}}[{timeRange}])'.format(
+        query = 'increase(gateway_function_in_flight{{function_name=~"{funcName}\\\\..*"}}[{timeRange}]'.format(
             funcName=funcName, timeRange=timeRange)
+        if is_offset:
+            query = query + ' offset ' + str(offset)
+        query = query + ')'
         res = self.monitorCenter.promManager.query(
             query)['data'][0]['value'][1]
         return res

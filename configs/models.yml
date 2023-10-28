@@ -1,9 +1,13 @@
 urlDictList:
   - modelName: linear-regression
     modelUrl: http://admin:admin@10.60.150.177:31112/function/lr
+    model_id: 1
   - modelName: support-vector-machine
     modelUrl: http://admin:admin@10.60.150.177:31112/function/svr
+    model_id: 2
   - modelName: random-forest
     modelUrl: http://admin:admin@10.60.150.177:31112/function/rf
+    model_id: 3
   - modelName: lstm
     modelUrl: http://admin:admin@10.60.150.177:31112/function/lstm
+    model_id: 4
