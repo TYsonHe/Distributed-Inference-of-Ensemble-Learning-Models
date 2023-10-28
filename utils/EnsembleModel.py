@@ -1,6 +1,6 @@
 import threading
 import time
-
+import random
 import requests
 import yaml
 
@@ -41,6 +41,20 @@ class EnsembleModel:
         with open(self.modelConfigPath, 'r') as f:
             modelConfig = yaml.load(f, Loader=yaml.FullLoader)
         self.urlDictList = modelConfig['urlDictList']
+        self.distributeWeights()
+
+    def distributeWeights(self) -> None:
+        '''
+        集成模型的参数分发
+        '''
+        num_models = self.getModelsNum()
+        # 随机生成权重
+        self.weights = [random.uniform(0, 1) for _ in range(num_models)]
+        # 归一化
+        self.weights = [w / sum(self.weights) for w in self.weights]
+        # 分发权重
+        for urlDict, weight in zip(self.urlDictList, self.weights):
+            urlDict['weight'] = weight
 
     def addModel(self, urlDict) -> None:
         '''
@@ -89,6 +103,7 @@ class EnsembleModel:
         modelResult['modelName'] = urlDict['modelName']
         modelResult['predictValue'] = r.text.replace('\n', '')
         modelResult['timeTaken'] = endTime - startTime
+        modelResult['weight'] = urlDict['weight']
         self.results.append(modelResult)
         if printResult:
             print("Time taken for", url, ":",
@@ -132,8 +147,8 @@ class EnsembleModel:
                       ":", self.results[i]['predictValue'])
         ensemblePredictValue = 0
         for i in range(modelNum):
-            ensemblePredictValue += float(self.results[i]['predictValue'])
-        ensemblePredictValue /= modelNum
+            ensemblePredictValue += float(
+                self.results[i]['predictValue'])*self.results[i]['weight']
         if printResult:
             print("集成模型预测结果:", ensemblePredictValue)
         return self.results, ensemblePredictValue

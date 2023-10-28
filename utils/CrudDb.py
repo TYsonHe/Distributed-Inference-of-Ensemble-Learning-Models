@@ -1,21 +1,27 @@
 import pymysql
-import json
+import yaml
 
 
 class CrudDb:
-    def __init__(self, host, user, password, dbname, port, charset):
+    def __init__(self, configPath: str) -> None:
         """
         :param conn: 数据库连接
         :param cur: 数据库游标(dict类型)
         """
         self.conn = None
         self.cur = None
-        self.dbname = dbname
-        self.host = host
-        self.user = user
-        self.password = password
-        self.port = port
-        self.charset = charset
+        self.configPath = configPath
+        self.loadConfig()
+
+    def loadConfig(self) -> None:
+        with open(self.configPath, 'r') as f:
+            config = yaml.load(f, Loader=yaml.FullLoader)
+        self.host = config['host']
+        self.user = config['user']
+        self.password = config['password']
+        self.dbname = config['dbname']
+        self.port = config['port']
+        self.charset = config['charset']
 
     def BuildConnection(self):
         """
@@ -111,9 +117,8 @@ class CrudDb:
 
 # test
 if __name__ == '__main__':
-    crudDb = CrudDb('10.60.150.177', 'root', '123456',
-                    'model_historical_error', 3306, 'utf8')
+    crudDb = CrudDb('configs\db.yml')
     crudDb.BuildConnection()
-    result = crudDb.RetrieveData('desc regression_models')
+    result = crudDb.RetrieveData('desc models')
     crudDb.CloseConnection()
     print(result)

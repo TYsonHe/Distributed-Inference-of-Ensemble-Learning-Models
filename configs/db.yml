@@ -1,0 +1,7 @@
+version: MySQL
+host: 10.60.150.177
+port: 3306
+user: root
+password: "123456"
+dbname: model_historical_error
+charset: utf8
