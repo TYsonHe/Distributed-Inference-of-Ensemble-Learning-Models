@@ -15,3 +15,7 @@ utils/MonitorCenter/__pycache__/KubeStateMetrics.cpython-39.pyc
 utils/MonitorCenter/__pycache__/MonitorCenter.cpython-39.pyc
 utils/MonitorCenter/__pycache__/NodeExporter.cpython-39.pyc
 utils/MonitorCenter/__pycache__/PrometheusManager.cpython-39.pyc
+utils/__pycache__/CrudDb.cpython-39.pyc
+utils/PrecisionSensor/__pycache__/ClassificationMetrics.cpython-39.pyc
+utils/PrecisionSensor/__pycache__/PrecisionSensor.cpython-39.pyc
+utils/PrecisionSensor/__pycache__/RegressionMetrics.cpython-39.pyc

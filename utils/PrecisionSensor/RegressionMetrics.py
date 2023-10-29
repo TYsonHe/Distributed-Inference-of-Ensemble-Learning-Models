@@ -9,8 +9,13 @@ class RegressionMetrics:
     '''
 
     def __init__(self, y_true, y_pred):
-        self.y_true = y_true
-        self.y_pred = y_pred
+        self.y_true = np.array(y_true)
+        self.y_pred = np.array(y_pred)
+
+    @staticmethod
+    def metrics_types():
+        metrics_types = ['mae', 'mse', 'rmse', 'mape', 'r2']
+        return metrics_types
 
     def mean_absolute_error(self):
         return np.mean(np.abs(self.y_true - self.y_pred))
@@ -41,11 +46,12 @@ class RegressionMetrics:
 
 # test
 if __name__ == "__main__":
-    y_true = np.array([3, -0.5, 2, 7])
-    y_pred = np.array([2.5, 0.0, 2, 8])
+    y_true = (3, -0.5, 2, 7)
+    y_pred = [2.5, 0.0, 2, 8]
     regressionMetrics = RegressionMetrics(y_true, y_pred)
     print(regressionMetrics.mean_absolute_error())
     print(regressionMetrics.mean_squared_error())
     print(regressionMetrics.root_mean_squared_error())
     print(regressionMetrics.mean_absolute_percentage_error())
     print(regressionMetrics.r_squared())
+    print(regressionMetrics.metrics_types())

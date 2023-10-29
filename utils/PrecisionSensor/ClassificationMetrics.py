@@ -9,12 +9,17 @@ class ClassificationMetrics:
     '''
 
     def __init__(self, y_true, y_pred):
-        self.y_true = y_true
-        self.y_pred = y_pred
+        self.y_true = np.array(y_true)
+        self.y_pred = np.array(y_pred)
         self.tp = np.sum((self.y_true == 1) & (self.y_pred == 1))
         self.tn = np.sum((self.y_true == 0) & (self.y_pred == 0))
         self.fp = np.sum((self.y_true == 0) & (self.y_pred == 1))
         self.fn = np.sum((self.y_true == 1) & (self.y_pred == 0))
+
+    @staticmethod
+    def metrics_types():
+        metrics_types = ['accuracy', 'precision', 'recall', 'f1_score']
+        return metrics_types
 
     def accuracy(self):
         return (self.tp + self.tn) / (self.tp + self.tn + self.fp + self.fn)
@@ -39,14 +44,14 @@ class ClassificationMetrics:
         result['precision'] = self.precision()
         result['recall'] = self.recall()
         result['f1_score'] = self.f1_score()
-        result['confusionMatrix'] = self.confusionMatrix()
+        # result['confusionMatrix'] = self.confusionMatrix()
         return result
 
 
 # test
 if __name__ == "__main__":
-    y_true = np.array([1, 0, 1, 1, 0, 1])
-    y_pred = np.array([1, 0, 1, 0, 0, 1])
+    y_true = [1, 0, 1, 1, 0, 1]
+    y_pred = [1, 0, 1, 0, 0, 1]
     classificationMetrics = ClassificationMetrics(y_true, y_pred)
     print(classificationMetrics.accuracy())
     print(classificationMetrics.precision())

@@ -88,6 +88,12 @@ class EnsembleModel:
         '''
         return self.urlDictList
 
+    def getModelName(self, index) -> str:
+        '''
+        获取当前模型的名字
+        '''
+        return self.urlDictList[index]['modelName']
+
     def sendRequestAndStoreResult(self, urlDict, data, printResult=False):
         '''
         发送请求并将结果存储在results列表中
