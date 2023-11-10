@@ -41,6 +41,7 @@ class EnsembleModel:
         with open(self.modelConfigPath, 'r') as f:
             modelConfig = yaml.load(f, Loader=yaml.FullLoader)
         self.urlDictList = modelConfig['urlDictList']
+        # 分发权重
         self.distributeWeights()
 
     def distributeWeights(self) -> None:
@@ -55,6 +56,22 @@ class EnsembleModel:
         # 分发权重
         for urlDict, weight in zip(self.urlDictList, self.weights):
             urlDict['weight'] = weight
+
+    def get_weight(self, model_name: str) -> float:
+        '''
+        获取模型的权重
+        '''
+        for urlDict in self.urlDictList:
+            if urlDict['modelName'] == model_name:
+                return urlDict['weight']
+
+    def modify_weight(self, model_name: str, new_weight: float) -> None:
+        '''
+        修改模型的权重
+        '''
+        for urlDict in self.urlDictList:
+            if urlDict['modelName'] == model_name:
+                urlDict['weight'] = new_weight
 
     def addModel(self, urlDict) -> None:
         '''

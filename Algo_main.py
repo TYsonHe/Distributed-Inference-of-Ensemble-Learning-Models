@@ -29,7 +29,7 @@ ensembel_model = EnsembleModel('configs/models.yml')
 #################################### end of loading config ##############################
 
 #################################### start of running ###################################
-TEXT_ID = 1
+TEXT_ID = 2  # 用于标识当前的文本,按需修改
 urlDictList = ensembel_model.getUrlDictList()
 
 # 算法构建
@@ -101,7 +101,7 @@ for i in range(0, len(input_datas_str), detect_round):
                 break
         # 一共有5个metric_type
         for type in precision_sensor.metrics_types():
-            query = f'insert into performance_metrics (model_id, metric_type, metric_value, metric_round_id,text_id) values ({model_id}, "{type}", "{precision_model_result[type]}",{i/detect_round+1} ,{TEXT_ID})'
+            query = f'insert into performance_metrics (model_id, metric_type, metric_value, window_id,text_id) values ({model_id}, "{type}", "{precision_model_result[type]}",{i/detect_round+1} ,{TEXT_ID})'
             # print(query)
             db.CreateData(query)
 
