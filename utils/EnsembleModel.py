@@ -57,20 +57,20 @@ class EnsembleModel:
         for urlDict, weight in zip(self.urlDictList, self.weights):
             urlDict['weight'] = weight
 
-    def get_weight(self, model_name: str) -> float:
+    def get_weight(self, model_id: int) -> float:
         '''
         获取模型的权重
         '''
         for urlDict in self.urlDictList:
-            if urlDict['modelName'] == model_name:
+            if urlDict['model_id'] == model_id:
                 return urlDict['weight']
 
-    def modify_weight(self, model_name: str, new_weight: float) -> None:
+    def modify_weight(self, model_id: int, new_weight: float) -> None:
         '''
         修改模型的权重
         '''
         for urlDict in self.urlDictList:
-            if urlDict['modelName'] == model_name:
+            if urlDict['model_id'] == model_id:
                 urlDict['weight'] = new_weight
 
     def addModel(self, urlDict) -> None:
@@ -110,6 +110,14 @@ class EnsembleModel:
         获取当前模型的名字
         '''
         return self.urlDictList[index]['modelName']
+
+    def get_model_id(self, model_name: str) -> int:
+        '''
+        获取模型的id
+        '''
+        for urlDict in self.urlDictList:
+            if urlDict['modelName'] == model_name:
+                return urlDict['model_id']
 
     def sendRequestAndStoreResult(self, urlDict, data, printResult=False):
         '''

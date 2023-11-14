@@ -1,9 +1,11 @@
+from utils.CrudDb import CrudDb
 from utils.DataLoader import DataLoader
 from utils.EnsembleModel import EnsembleModel
+from utils.FuncMonitor import FuncMonitor
+from utils.ModelSchedualingCenter.DynamicSelect import DynamicSelect
+from utils.ModelSchedualingCenter.DynamicWeight import DynamicWeight
 from utils.MonitorCenter.MonitorCenter import MonitorCenter
 from utils.PrecisionSensor.PrecisionSensor import PrecisionSensor
-from utils.FuncMonitor import FuncMonitor
-from utils.CrudDb import CrudDb
 
 #################################### load config ####################################
 # monitor_center
@@ -101,7 +103,7 @@ for i in range(0, len(input_datas_str), detect_round):
                 break
         # 一共有5个metric_type
         for type in precision_sensor.metrics_types():
-            query = f'insert into performance_metrics (model_id, metric_type, metric_value, window_id,text_id) values ({model_id}, "{type}", "{precision_model_result[type]}",{i/detect_round+1} ,{TEXT_ID})'
+            query = f'insert into performance_metrics (model_id, metric_type, metric_value, window_id,text_id) values ({model_id}, "{type}", "{precision_model_result[type]}",{i / detect_round + 1} ,{TEXT_ID})'
             # print(query)
             db.CreateData(query)
 
@@ -110,5 +112,9 @@ for i in range(0, len(input_datas_str), detect_round):
     precision_ensemble_result = precision_sensor.calcPrecision()
     print(
         f'ensembleModel, precision: {precision_ensemble_result}')
+
+    dynamic_weight = DynamicWeight(ensembel_model, db)
+    dynamic_select = DynamicSelect(ensembel_model, db)
+    dynamic_weight.algo(TEXT_ID, i / detect_round + 1)
 
 db.CloseConnection()
