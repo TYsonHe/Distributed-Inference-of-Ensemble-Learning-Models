@@ -1,0 +1,26 @@
+main_model:
+  - name: stock-predict
+    modelUrl: http://admin:admin@10.60.150.177:31112/function/stock-predict
+
+    base_learners:
+      - name: gnb
+        modelUrl: http://admin:admin@10.60.150.177:31112/function/gnb
+      - name: knn
+        modelUrl: http://admin:admin@10.60.150.177:31112/function/knn
+      - name: logisticregression
+        modelUrl: http://admin:admin@10.60.150.177:31112/function/logisticregression
+      - name: dt
+        modelUrl: http://admin:admin@10.60.150.177:31112/function/dt
+      - name: svc
+        modelUrl: http://admin:admin@10.60.150.177:31112/function/svc
+
+  - name: object-detection
+    modelUrl: http://admin:admin@10.60.150.177:31112/function/object-detection
+
+    base_learners:
+      - name: yolo-darknet
+        modelUrl: http://admin:admin@10.60.150.177:31112/function/yolo-darknet
+      - name: ssd-resnet
+        modelUrl: http://admin:admin@10.60.150.177:31112/function/ssd-resnet
+      - name: retina-resnet50
+        modelUrl: http://admin:admin@10.60.150.177:31112/function/retina-resnet50
