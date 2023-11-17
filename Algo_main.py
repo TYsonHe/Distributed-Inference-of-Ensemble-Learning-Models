@@ -31,7 +31,8 @@ ensembel_model = EnsembleModel('configs/models.yml')
 #################################### end of loading config ##############################
 
 #################################### start of running ###################################
-TEXT_ID = 2  # 用于标识当前的文本,按需修改
+USED_ALGO = True
+TEXT_ID = 3  # 用于标识当前的文本,按需修改
 urlDictList = ensembel_model.getUrlDictList()
 
 # 算法构建
@@ -113,8 +114,9 @@ for i in range(0, len(input_datas_str), detect_round):
     print(
         f'ensembleModel, precision: {precision_ensemble_result}')
 
-    dynamic_weight = DynamicWeight(ensembel_model, db)
-    dynamic_select = DynamicSelect(ensembel_model, db)
-    dynamic_weight.algo(TEXT_ID, i / detect_round + 1)
+    if USED_ALGO:
+        dynamic_weight = DynamicWeight(ensembel_model, db)
+        dynamic_select = DynamicSelect(ensembel_model, db)
+        dynamic_weight.algo(TEXT_ID, i / detect_round + 1)
 
 db.CloseConnection()
