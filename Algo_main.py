@@ -32,7 +32,7 @@ ensembel_model = EnsembleModel('configs/models.yml')
 
 #################################### start of running ###################################
 USED_ALGO = True
-TEXT_ID = 3  # 用于标识当前的文本,按需修改
+TEXT_ID = 4  # 用于标识当前的文本,按需修改
 urlDictList = ensembel_model.getUrlDictList()
 
 # 算法构建
