@@ -2,12 +2,13 @@
 Author: yingxin wang
 Date: 2023-11-16 15:17:56
 LastEditors: yingxin wang
-LastEditTime: 2023-11-16 22:09:23
+LastEditTime: 2023-11-17 21:32:59
 Description: 实现缩放中心的功能
 '''
 import yaml
 import schedule
 import time
+import math
 
 from utils.ScalingCenter.KubeApiServer import KubeApiServer
 from utils.ScalingCenter.ScalingMetrics import ScalingMetrics
@@ -51,9 +52,9 @@ class ScalingCenter:
         elif request_count == 0: #没有请求，缩减至0
             target_replica_count=0
         elif request_count > threshold and self.can_scale: #大于阈值，扩容
-            target_replica_count = min(max_replica_count, request_count // threshold)
+            target_replica_count = min(max_replica_count, math.ceil(request_count / threshold))
         elif request_count < threshold and self.can_scale:  #小于阈值，缩容
-            target_replica_count = max(min_replica_count, request_count // threshold ,1) #最少一个副本，因为至少是有请求的
+            target_replica_count = max(min_replica_count, math.ceil(request_count / threshold) ,1) #最少一个副本，因为至少是有请求的
 
         print(f"{model_name} : Current request count {request_count}, current replica count {replica_count}, target replica count {target_replica_count}")
         if target_replica_count == replica_count:    #如果目标副本数和当前副本数相同，不做操作，直接返回
