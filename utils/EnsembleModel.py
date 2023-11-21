@@ -1,8 +1,11 @@
+import random
 import threading
 import time
-import random
+
 import requests
+import socket
 import yaml
+import re
 
 
 class EnsembleModel:
@@ -31,6 +34,8 @@ class EnsembleModel:
         self.modelConfigPath = modelConfigPath
         self.loadModelConfig()
         self.results = []
+        self.x_call_ids = []
+        self.x_call_nums = len(self.urlDictList)
 
     def loadModelConfig(self) -> None:
         '''
@@ -41,6 +46,7 @@ class EnsembleModel:
         with open(self.modelConfigPath, 'r') as f:
             modelConfig = yaml.load(f, Loader=yaml.FullLoader)
         self.urlDictList = modelConfig['urlDictList']
+        self.callback_url = modelConfig['callback_url']
         # 分发权重
         self.distributeWeights()
 
@@ -119,26 +125,44 @@ class EnsembleModel:
             if urlDict['modelName'] == model_name:
                 return urlDict['model_id']
 
-    def sendRequestAndStoreResult(self, urlDict, data, printResult=False):
+    # 只需要请求体
+    def extract_request_body(self, http_request_str: str):
+        # 寻找空行分隔请求头和请求体
+        double_newline_index = http_request_str.find('\r\n\r\n')
+
+        if double_newline_index != -1:
+            # 提取请求体
+            request_body = http_request_str[double_newline_index + 4:]
+            return request_body
+
+        return None
+
+    def send_request(self, urlDict, data, printResult=False):
         '''
-        发送请求并将结果存储在results列表中
+        发送请求并将结果一部分存储在results列表中
         时间单位:秒
         '''
         startTime = time.time()  # 记录开始时间
         url = urlDict['modelUrl']
         if printResult:
             print(time.asctime(), "Sending request to", url)
-        r = requests.get(url, data=data)
-        endTime = time.time()  # 记录结束时间
-        modelResult = dict()
-        modelResult['modelName'] = urlDict['modelName']
-        modelResult['predictValue'] = r.text.replace('\n', '')
-        modelResult['timeTaken'] = endTime - startTime
-        modelResult['weight'] = urlDict['weight']
-        self.results.append(modelResult)
-        if printResult:
-            print("Time taken for", url, ":",
-                  modelResult['timeTaken'], "seconds")  # 计算执行时间并打印
+        headers = {'X-Callback-Url': self.callback_url}
+        response = requests.post(url, data=data, headers=headers)
+        if response.status_code == 202:
+            endTime = time.time()  # 记录结束时间
+            # 提取并保存X-Call-Id
+            x_call_id = response.headers.get('X-Call-Id')
+            if x_call_id:
+                self.x_call_ids.append(x_call_id)
+            modelResult = dict()
+            modelResult['modelName'] = urlDict['modelName']
+            modelResult['x_call_id'] = x_call_id
+            modelResult['startTime'] = startTime
+            modelResult['endTime'] = endTime
+            modelResult['timeTaken'] = endTime - startTime
+            modelResult['weight'] = urlDict['weight']
+            # 提取并保存预测结果
+            self.results.append(modelResult)
 
     def run(self, inputData: str, printResult=False) -> tuple:
         '''
@@ -162,7 +186,7 @@ class EnsembleModel:
         # 创建线程
         for i in range(modelNum):
             thread = threading.Thread(
-                target=self.sendRequestAndStoreResult, args=(self.urlDictList[i], inputData, printResult))
+                target=self.send_request, args=(self.urlDictList[i], inputData, printResult))
             threads.append(thread)
         # 启动线程
         for i in range(modelNum):
@@ -170,6 +194,59 @@ class EnsembleModel:
         # 等待线程执行完毕
         for i in range(modelNum):
             threads[i].join()
+
+        # 等待回调
+        print("Waiting for callback...")
+        print(self.x_call_ids)
+
+        ##开始监听端口获取回调结果
+        # 启动HTTP服务器
+        server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        # 启用 SO_REUSEPORT 选项，保证多个进程可以同时监听一个端口
+        server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT, 1)
+        server_socket.bind(('10.60.150.177', 8888))
+        server_socket.listen(1)
+        print("Server listening on port 8888")
+
+        while True:
+            # 等待客户端连接
+            client_socket, addr = server_socket.accept()
+            print("Connection from {addr}")
+            # 接收数据
+            data = client_socket.recv(1024)
+            if not data:
+                break
+
+            # data本身是byte型
+            data = str(data, 'utf-8')
+            # 使用正则表达式提取X-Call-Id
+            match = re.search(r'X-Call-Id: (.+)', data)
+
+            if match:
+                x_call_id = match.group(1)
+                x_call_id = x_call_id.replace("\r", "").replace("\n", "")
+
+                # 如果提取到的X-Call-Id在数组中，进行相应的处理
+                if x_call_id in self.x_call_ids:
+                    results_str = self.extract_request_body(data)
+                    # 在results中找到对应的模型
+                    for i in range(modelNum):
+                        if self.results[i]['x_call_id'] == x_call_id:
+                            self.results[i]['predictValue'] = results_str
+                    self.x_call_nums = self.x_call_nums - 1
+
+                    # 获取到所有的内容
+                    if self.x_call_nums == 0:
+                        client_socket.close()
+                        break
+
+            # 关闭连接
+            client_socket.close()
+
+        # 关闭服务器socket
+        server_socket.close()
+        ##结束监听端口获取回调结果
+
         # 打印并返回结果
         if printResult:
             print("Result:")
@@ -179,7 +256,7 @@ class EnsembleModel:
         ensemblePredictValue = 0
         for i in range(modelNum):
             ensemblePredictValue += float(
-                self.results[i]['predictValue'])*self.results[i]['weight']
+                self.results[i]['predictValue']) * self.results[i]['weight']
         if printResult:
             print("集成模型预测结果:", ensemblePredictValue)
         return self.results, ensemblePredictValue
@@ -188,6 +265,6 @@ class EnsembleModel:
 # 测试代码
 if __name__ == '__main__':
     inputData = '0.0,0.676964737573449,1.5622877677766447,0.5555330632092685,0.4579332723844055,0.5947720595105965,-0.18367590319728047,-0.41592761460465344,-0.39791121287711007,-0.40996003084539434,-0.3979112128771097,2.3704530408864093,-0.40395533950919793,-0.40996003084539434'
-    ensembleModel = EnsembleModel('configs/models.yml')
+    ensembleModel = EnsembleModel('D:\homework\Distributed Inference of Ensemble Learning Models\configs\models.yml')
     singleResult = ensembleModel.run(inputData)
     print(singleResult)
