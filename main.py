@@ -31,4 +31,6 @@ if __name__ == "__main__":
     # request_emitter.initHttpRequest('http://10.60.150.177:31112/function/stock-predict','GET')
     # request_emitter.initData(False,False,'testDataSets/stockPredict/dji_x_test_full.csv')
     # #%%
-    # request_emitter.loadTest(1,(1,9),2)
+    # request_emitter.loadTest(1,(1,9),4)
+    # #%%
+    # request_emitter.plotGraph()
