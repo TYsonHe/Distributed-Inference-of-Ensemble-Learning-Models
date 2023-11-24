@@ -204,7 +204,7 @@ class EnsembleModel:
         server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         # 启用 SO_REUSEPORT 选项，保证多个进程可以同时监听一个端口
         server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT, 1)
-        server_socket.bind(('10.60.150.177', 8888))
+        server_socket.bind(('0.0.0.0', 8888))
         server_socket.listen(1)
         print("Server listening on port 8888")
 
@@ -265,6 +265,6 @@ class EnsembleModel:
 # 测试代码
 if __name__ == '__main__':
     inputData = '0.0,0.676964737573449,1.5622877677766447,0.5555330632092685,0.4579332723844055,0.5947720595105965,-0.18367590319728047,-0.41592761460465344,-0.39791121287711007,-0.40996003084539434,-0.3979112128771097,2.3704530408864093,-0.40395533950919793,-0.40996003084539434'
-    ensembleModel = EnsembleModel('D:\homework\Distributed Inference of Ensemble Learning Models\configs\models.yml')
+    ensembleModel = EnsembleModel('configs/models.yml')
     singleResult = ensembleModel.run(inputData)
     print(singleResult)

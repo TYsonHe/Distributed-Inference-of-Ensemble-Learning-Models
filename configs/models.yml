@@ -1,15 +1,15 @@
 urlDictList:
   - modelName: linear-regression
-    modelUrl: http://admin:admin@10.60.150.177:31112/function/lr
+    modelUrl: http://admin:admin@10.60.150.177:31112/async-function/lr
     model_id: 1
   - modelName: support-vector-machine
-    modelUrl: http://admin:admin@10.60.150.177:31112/function/svr
+    modelUrl: http://admin:admin@10.60.150.177:31112/async-function/svr
     model_id: 2
   - modelName: random-forest
-    modelUrl: http://admin:admin@10.60.150.177:31112/function/rf
+    modelUrl: http://admin:admin@10.60.150.177:31112/async-function/rf
     model_id: 3
   - modelName: lstm
-    modelUrl: http://admin:admin@10.60.150.177:31112/function/lstm
+    modelUrl: http://admin:admin@10.60.150.177:31112/async-function/lstm
     model_id: 4
 
 callback_url: http://10.60.150.177:8888
