@@ -12,10 +12,10 @@ class PrecisionSensor:
         self.y_pred = y_pred
 
     def setMetricsModel(self, model: str):
-        if model == 'Classification':
+        if model == 'classification':
             self.metricsModel = ClassificationMetrics(self.y_true, self.y_pred)
             self.metrics_types = ClassificationMetrics.metrics_types
-        elif model == 'Regression':
+        elif model == 'regression':
             self.metricsModel = RegressionMetrics(self.y_true, self.y_pred)
             self.metrics_types = RegressionMetrics.metrics_types
         # print(f'PrecisionSensor: {model} metricsModel is set.')

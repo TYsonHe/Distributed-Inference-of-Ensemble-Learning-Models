@@ -93,7 +93,7 @@ for i in range(0, len(input_datas_str), detect_round):
     for j in range(cur_models_num):
         precision_sensor.getData(
             cur_y_labels, models_results[j]['results'])
-        precision_sensor.setMetricsModel('Regression')
+        precision_sensor.setMetricsModel('regression')
         precision_model_result = precision_sensor.calcPrecision()
         # print(
         #     f'{models_results[j]["model_name"]}, precision: {precision_model_result}')
@@ -111,7 +111,7 @@ for i in range(0, len(input_datas_str), detect_round):
             db.CreateData(query)
 
     precision_sensor.getData(cur_y_labels, cur_round_ensemble_results)
-    precision_sensor.setMetricsModel('Regression')
+    precision_sensor.setMetricsModel('regression')
     precision_ensemble_result = precision_sensor.calcPrecision()
     print(
         f'ensembleModel, precision: {precision_ensemble_result}')

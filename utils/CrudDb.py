@@ -1,5 +1,6 @@
 import pymysql
 import yaml
+from pymysqlpool import ConnectionPool
 
 
 class CrudDb:
@@ -8,10 +9,10 @@ class CrudDb:
         :param conn: 数据库连接
         :param cur: 数据库游标(dict类型)
         """
-        self.conn = None
-        self.cur = None
         self.configPath = configPath
         self.loadConfig()
+        self.pool = ConnectionPool(host=self.host, user=self.user, password=self.password, db=self.dbname,
+                                   port=self.port, charset=self.charset, cursorclass=pymysql.cursors.DictCursor)
 
     def loadConfig(self) -> None:
         with open(self.configPath, 'r') as f:
@@ -23,36 +24,17 @@ class CrudDb:
         self.port = config['port']
         self.charset = config['charset']
 
-    def BuildConnection(self):
-        """
-        :param host: 数据库地址
-        :param user: 用户名
-        :param password: 密码
-        :param dbname: 数据库名
-        :param port: 端口号
-        :param charset: 字符集
-        :return: None
-        """
-        self.conn = pymysql.connect(host=self.host, user=self.user, password=self.password,
-                                    db=self.dbname, port=self.port, charset=self.charset)
-        self.cur = self.conn.cursor(cursor=pymysql.cursors.DictCursor)
-
-    def CloseConnection(self):
-        """
-        释放数据库连接
-        :return: None
-        """
-        self.cur.close()
-        self.conn.close()
-
     def RetrieveData(self, query):
         """
         :param query: 查询语句
         :return: 查询结果
         """
         try:
-            self.cur.execute(query)
-            result = self.cur.fetchall()
+            conn = self.pool.get_connection()
+            with conn.cursor() as cur:
+                cur.execute(query)
+                result = cur.fetchall()
+            conn.close()
             return result
         except Exception as e:
             print(f'RetrieveFailed, CatchError:{e}')
@@ -64,9 +46,11 @@ class CrudDb:
         :return: 插入结果
         """
         try:
-            self.cur.execute(query)
-            # 这里要注意，插入数据后要commit才能生效
-            self.conn.commit()
+            conn = self.pool.get_connection()
+            with conn.cursor() as cur:
+                cur.execute(query)
+            conn.commit()
+            conn.close()
             return 'CreateSuccess'
         except Exception as e:
             print(f'CreateFailed, CatchError:{e}')
@@ -78,9 +62,11 @@ class CrudDb:
         :return: 更新结果
         """
         try:
-            self.cur.execute(query)
-            # 这里要注意，更新数据后要commit才能生效
-            self.conn.commit()
+            conn = self.pool.get_connection()
+            with conn.cursor() as cur:
+                cur.execute(query)
+            conn.commit()
+            conn.close()
             return 'UpdateSuccess'
         except Exception as e:
             print(f'UpdateFailed, CatchError:{e}')
@@ -92,9 +78,11 @@ class CrudDb:
         :return: 删除结果
         """
         try:
-            self.cur.execute(query)
-            # 这里要注意，删除数据后要commit才能生效
-            self.conn.commit()
+            conn = self.pool.get_connection()
+            with conn.cursor() as cur:
+                cur.execute(query)
+            conn.commit()
+            conn.close()
             return 'DeleteSuccess'
         except Exception as e:
             print(f'DeleteFailed, CatchError:{e}')
@@ -107,8 +95,11 @@ class CrudDb:
         :return: 执行结果
         """
         try:
-            self.cur.execute(query, values)
-            self.conn.commit()  # 根据操作类型，需要commit才能生效
+            conn = self.pool.get_connection()
+            with conn.cursor() as cur:
+                cur.execute(query)
+            conn.commit()
+            conn.close()
             return 'ExecuteSuccess'
         except Exception as e:
             print(f'ExecuteFailed, CatchError:{e}')
@@ -118,7 +109,5 @@ class CrudDb:
 # test
 if __name__ == '__main__':
     crudDb = CrudDb('configs\db.yml')
-    crudDb.BuildConnection()
     result = crudDb.RetrieveData('desc models')
-    crudDb.CloseConnection()
     print(result)
