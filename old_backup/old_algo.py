@@ -31,8 +31,8 @@ ensembel_model = EnsembleModel('configs/models.yml')
 #################################### end of loading config ##############################
 
 #################################### start of running ###################################
-USED_ALGO = True
-TEXT_ID = 4  # 用于标识当前的文本,按需修改
+USED_ALGO = False
+TEXT_ID = 1  # 用于标识当前的文本,按需修改
 urlDictList = ensembel_model.getUrlDictList()
 
 # 算法构建
@@ -63,6 +63,7 @@ for i in range(0, len(input_datas_str), detect_round):
     for j in range(detect_round):
         results, ensemble_predict_value = ensembel_model.run(
             cur_input_datas_str[j])
+        print(f'results: {results}')
         cur_round_models_results.append(results)
         cur_round_ensemble_results.append(ensemble_predict_value)
 
@@ -101,10 +102,11 @@ for i in range(0, len(input_datas_str), detect_round):
         for urlDict in urlDictList:
             if urlDict['modelName'] == models_results[j]['model_name']:
                 model_id = urlDict['model_id']
+                create_time = models_results[j]['create_time']
                 break
         # 一共有5个metric_type
         for type in precision_sensor.metrics_types():
-            query = f'insert into performance_metrics (model_id, metric_type, metric_value, window_id,text_id) values ({model_id}, "{type}", "{precision_model_result[type]}",{i / detect_round + 1} ,{TEXT_ID})'
+            query = f'insert into performance_metrics (model_id, metric_type, metric_value, window_id,text_id,create_time) values ({model_id}, "{type}", "{precision_model_result[type]}",{i / detect_round + 1} ,{TEXT_ID},"{create_time}")'
             # print(query)
             db.CreateData(query)
 

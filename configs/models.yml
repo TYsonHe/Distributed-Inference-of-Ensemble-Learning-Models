@@ -12,4 +12,5 @@ urlDictList:
     modelUrl: http://admin:admin@10.60.150.177:31112/async-function/lstm
     model_id: 4
 
-callback_url: http://10.60.150.177:8888
+#callback_url: http://10.60.150.177:8888
+#callback_url: http://100.80.168.178:8888

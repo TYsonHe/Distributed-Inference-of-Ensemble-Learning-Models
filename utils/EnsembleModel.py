@@ -6,6 +6,7 @@ import requests
 import socket
 import yaml
 import re
+import os
 
 
 class EnsembleModel:
@@ -164,7 +165,7 @@ class EnsembleModel:
             # 提取并保存预测结果
             self.results.append(modelResult)
 
-    def run(self, inputData: str, printResult=False) -> tuple:
+    def async_run(self, inputData: str, printResult=False) -> tuple:
         '''
         运行集成模型
         输入:
@@ -203,7 +204,7 @@ class EnsembleModel:
         # 启动HTTP服务器
         server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         # 启用 SO_REUSEPORT 选项，保证多个进程可以同时监听一个端口
-        server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT, 1)
+        server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         server_socket.bind(('0.0.0.0', 8888))
         server_socket.listen(1)
         print("Server listening on port 8888")
@@ -211,7 +212,7 @@ class EnsembleModel:
         while True:
             # 等待客户端连接
             client_socket, addr = server_socket.accept()
-            print("Connection from {addr}")
+            print(f"Connection from {addr}")
             # 接收数据
             data = client_socket.recv(1024)
             if not data:
@@ -232,7 +233,7 @@ class EnsembleModel:
                     # 在results中找到对应的模型
                     for i in range(modelNum):
                         if self.results[i]['x_call_id'] == x_call_id:
-                            self.results[i]['predictValue'] = results_str
+                            self.results[i]['predictValue'] = results_str.strip()
                     self.x_call_nums = self.x_call_nums - 1
 
                     # 获取到所有的内容
@@ -264,7 +265,17 @@ class EnsembleModel:
 
 # 测试代码
 if __name__ == '__main__':
-    inputData = '0.0,0.676964737573449,1.5622877677766447,0.5555330632092685,0.4579332723844055,0.5947720595105965,-0.18367590319728047,-0.41592761460465344,-0.39791121287711007,-0.40996003084539434,-0.3979112128771097,2.3704530408864093,-0.40395533950919793,-0.40996003084539434'
-    ensembleModel = EnsembleModel('configs/models.yml')
-    singleResult = ensembleModel.run(inputData)
-    print(singleResult)
+    print(os.getcwd())
+    # 读取X_test.csv的每一行，只需要字符串
+    with open('../testDataSets/X_test.csv', 'r') as f:
+        lines = f.readlines()
+    # 去掉第一行
+    lines = lines[1:]
+    # 去掉换行符
+    lines = [line.strip() for line in lines]
+    print(lines)
+    for i in range(len(lines)):
+        inputData = lines[i]
+        ensembleModel = EnsembleModel('../configs/models.yml')
+        singleResult = ensembleModel.async_run(inputData)
+        print(singleResult)
