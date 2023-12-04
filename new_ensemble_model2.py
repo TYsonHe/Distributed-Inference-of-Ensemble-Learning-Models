@@ -79,23 +79,23 @@ def process_request():
         results.append(result)
         # 4.将模型返回结果送入数据库
         # new_url = 'http://10.60.150.177:8001/'
-        new_url = 'http://localhost:8001/'
-        new_headers = {
-            'Content-Type': 'application/json',
-            'Accept': '*/*',
-            'Connection': 'keep-alive'
-        }
-        new_data = {
-            'model_id': model_id,
-            'model_result': model_result,
-            'y_true': y_true,
-            'create_time': create_time
-        }
-        new_response = requests.request(
-            "POST", url=new_url, headers=new_headers, json=new_data)
-        print(new_response.status_code)
-        if new_response.status_code == 200:
-            print('模型感知器接收成功')
+        # new_url = 'http://localhost:8001/'
+        # new_headers = {
+        #     'Content-Type': 'application/json',
+        #     'Accept': '*/*',
+        #     'Connection': 'keep-alive'
+        # }
+        # new_data = {
+        #     'model_id': model_id,
+        #     'model_result': model_result,
+        #     'y_true': y_true,
+        #     'create_time': create_time
+        # }
+        # new_response = requests.request(
+        #     "POST", url=new_url, headers=new_headers, json=new_data)
+        # print(new_response.status_code)
+        # if new_response.status_code == 200:
+        #     print('模型感知器接收成功')
 
     # 5.1 创建线程
     threads = []
@@ -109,19 +109,30 @@ def process_request():
     for t in threads:
         t.join()
 
-    # 6.关闭游标和连接
-    cursor.close()
-    conn.close()
-
     # 7.计算集成结果
     ensemble_result = 0
     for result in results:
         ensemble_result += result['model_weight'] * \
                            float(result['model_result'])
-    results.append({'ensemble_result': ensemble_result})
+    # results.append({'ensemble_result': ensemble_result})
+
+    print(results)
+
+    # 将结果送入数据库
+    for result in results:
+        sql = f'INSERT INTO models_results (model_id,model_result,y_true,create_time) VALUES ({result["model_id"]},"{result["model_result"]}","{result["y_true"]}","{result["create_time"]}")'
+        cursor.execute(sql)
+        conn.commit()
+
+    sql = f'INSERT INTO models_results (model_id,model_result,y_true,create_time) VALUES (101,"{ensemble_result}","{results[0]["y_true"]}","{results[0]["create_time"]}")'
+    cursor.execute(sql)
+    conn.commit()
+
+    # 关闭游标和连接
+    cursor.close()
+    conn.close()
 
     # 8.返回结果
-
     return f'{results}'
 
 
