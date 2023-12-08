@@ -19,9 +19,9 @@ class MonitorCenter:
         with open(self.configPath, 'r') as f:
             monitorCenterConfig = yaml.load(f, Loader=yaml.FullLoader)
         self.prometheusGateway = monitorCenterConfig['prometheusGateway']
-        self.openFaaSGateway = monitorCenterConfig['openFaaSGateway']
-        self.openFaaSUser = monitorCenterConfig['openFaaSBasicAuth']['user']
-        self.openFaaSPassword = monitorCenterConfig['openFaaSBasicAuth']['password']
+        self.knativeGateway = monitorCenterConfig['knativeGateway']
+        # self.openFaaSUser = monitorCenterConfig['openFaaSBasicAuth']['user']
+        # self.openFaaSPassword = monitorCenterConfig['openFaaSBasicAuth']['password']
 
 
 # test
