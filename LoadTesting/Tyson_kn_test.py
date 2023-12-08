@@ -1,16 +1,28 @@
-import datetime
 import pandas as pd
-import math
 import random
+import json
 
 from locust import LoadTestShape, task, constant, HttpUser
 
 # data_path="D:/CodingWork/git/Distributed-Inference-of-Ensemble-Learning-Models/testDataSets/stockPredict/dji_x_test_full.csv"
-data_path = "../testDataSets/stockPredict/dji_x_test_full.csv"
+data_path = "../testDataSets/X_test.csv"
+
 df = pd.read_csv(data_path, header=None)
+# 去掉第一行的列名
+df = df.drop([0])
 processed_data = df.apply(lambda row: ','.join(map(str, row)), axis=1)
 datas = processed_data.tolist()
+print(datas)
 datas_length = len(datas)
+
+y_data_path = "../testDataSets/y_test.csv"
+y_df = pd.read_csv(y_data_path, header=None)
+# 去掉第一行的列名
+y_df = y_df.drop([0])
+y_processed_data = y_df.apply(lambda row: ','.join(map(str, row)), axis=1)
+y_datas = y_processed_data.tolist()
+print(y_datas)
+y_datas_length = len(y_datas)
 
 invoke_data_path = "invoke_data.csv"
 invoke_data = pd.read_csv(invoke_data_path, header=None)
@@ -23,14 +35,18 @@ class MyUser(HttpUser):
 
     def on_start(self):
         self.headers = {
-            "Host": "stock-predict.knative-fn.knative.example.com"
+            "Host": "em-fn.knative-fn.knative.example.com",
+            "Content-Type": "application/json"
         }
 
     @task(1)
     def task_1(self):
         global datas_length, datas
         random_number = random.randint(0, datas_length - 1)
-        data = datas[random_number]
+        data = json.dumps({
+            "input_str": datas[random_number],
+            "y_true": y_datas[random_number]
+        })
         response = self.client.post('/', headers=self.headers, data=data)
         print(f"Response status code: {response.status_code}")
 
