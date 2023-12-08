@@ -26,7 +26,7 @@ class KubeStateMetrics:
     # 服务器节点上启动的pod
     def getPodsFromNode(self, node: str):
         res = {'status': 'error', 'pod_name': []}
-        query = 'kube_pod_info{{namespace="openfaas-fn", node="{node}"}}'.format(
+        query = 'kube_pod_info{{namespace="knative-fn", node="{node}"}}'.format(
             node=node)
         response = self.promManager.query(query)
         res['status'] = response['status']
@@ -38,7 +38,7 @@ class KubeStateMetrics:
     def getPods(self):
         res = {'status': 'error', 'pods': []}
         response = self.promManager.query(
-            'kube_pod_info{namespace="openfaas-fn"}')
+            'kube_pod_info{namespace="knative-fn"}')
         res['status'] = response['status']
         res['pods'] = [{
             'pod_name': record['metric']['pod'].split('-')[0],

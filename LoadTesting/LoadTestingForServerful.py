@@ -17,19 +17,14 @@ invoke_data_length = len(invoke_data)
 
 class MyUser(HttpUser):
     wait_time = constant(1)
-    host = "http://10.60.150.177:32619"  # 设置主机地址
-
-    def on_start(self):
-        self.headers = {
-            "Host": "stock-predict.knative-fn.knative.example.com"
-        }
+    host = "http://10.60.150.177:32057"  # 设置主机地址
 
     @task(1)
     def task_1(self):
         global datas_length,datas
         random_number = random.randint(0, datas_length-1)
         data=datas[random_number]
-        response = self.client.post('/',headers=self.headers,data=data)
+        response = self.client.post('/',data=data)
         print(f"Response status code: {response.status_code}")
 
 class MyCustomShape(LoadTestShape):

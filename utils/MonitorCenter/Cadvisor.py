@@ -64,6 +64,6 @@ class Cadvisor:
         # query = 'kube_pod_info{{namespace="openfaas-fn", pod=~"^{pod}.*"}}'.format(
         #     pod=pod + '-')
         # 这里加了'-'后就不对了
-        query = 'kube_pod_info{{namespace="openfaas-fn", pod=~"^{pod}.*"}}'.format(
+        query = 'kube_pod_info{{namespace="knative-fn", pod=~"^{pod}.*"}}'.format(
             pod=pod)
         return self.promManager.query(query)['data'][0]['metric']['node']
