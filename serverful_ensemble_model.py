@@ -28,6 +28,17 @@ def process_request():
 
     cursor = conn.cursor(cursor=pymysql.cursors.DictCursor)
 
+    # 增加count数量
+    sql = "UPDATE \
+               svc_model_cnt \
+           SET \
+               request_cnt = request_cnt + 1 \
+           WHERE \
+               svc_model_cnt.model_id = 101;"
+
+    cursor.execute(sql)
+    conn.commit()
+
     sql = "SELECT \
 		       svc_models.model_id, svc_models.model_name, svc_models_weight.weight as model_weight, svc_models.nodeport \
            FROM \

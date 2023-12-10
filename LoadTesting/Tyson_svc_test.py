@@ -4,9 +4,8 @@ import json
 
 from locust import LoadTestShape, task, constant, HttpUser
 
-# data_path="D:/CodingWork/git/Distributed-Inference-of-Ensemble-Learning-Models/testDataSets/stockPredict/dji_x_test_full.csv"
+# data_path = "D:/CodingWork/git/Distributed-Inference-of-Ensemble-Learning-Models/testDataSets/stockPredict/dji_x_test_full.csv"
 data_path = "../testDataSets/X_test.csv"
-
 df = pd.read_csv(data_path, header=None)
 # 去掉第一行的列名
 df = df.drop([0])
@@ -31,11 +30,10 @@ invoke_data_length = len(invoke_data)
 
 class MyUser(HttpUser):
     wait_time = constant(1)
-    host = "http://10.60.150.177:32619"  # 设置主机地址
+    host = "http://10.60.150.177:32005"  # 设置主机地址
 
     def on_start(self):
         self.headers = {
-            "Host": "em-fn.knative-fn.knative.example.com",
             "Content-Type": "application/json"
         }
 
@@ -51,7 +49,6 @@ class MyUser(HttpUser):
         print(f"Response status code: {response.status_code}")
 
 
-# 启动策略：逐步负载策略每隔30秒新增启动10个用户
 class MyCustomShape(LoadTestShape):
     '''
         spawn_rate -- 用户在每一步的停止/启动的多少用户数
@@ -64,7 +61,7 @@ class MyCustomShape(LoadTestShape):
         run_time = self.get_run_time()
         if run_time < self.time_limit:
             global invoke_data_length, invoke_data
-            index = int((int(run_time) + 1) % invoke_data_length)
+            index = int((int(run_time / 3) + 1) % invoke_data_length)
             user_count = int(invoke_data.at[index, 0])
             if user_count > 10:
                 user_count = user_count // 10
