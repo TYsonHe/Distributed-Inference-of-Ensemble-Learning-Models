@@ -1,10 +1,20 @@
 from utils.MonitorCenter.MonitorCenter import MonitorCenter
 import requests
+import os
 
 
 class FuncMonitor:
     def __init__(self, monitorCenter: MonitorCenter):
         self.monitorCenter = monitorCenter
+
+    def get_kn_request_cnt(self, kn_func_name: str, time_range: str, offset=0):
+        query = f'rate(activator_request_count{{namespace_name="knative-fn",response_code="200",service_name=~"^({kn_func_name}).*"}}[{time_range}])'
+        res = self.monitorCenter.promManager.query(
+            query)
+        if res['data'] == []:
+            return 0
+        res = res['data'][0]['value'][1]
+        return res
 
     # def getFuncList(self):
     #     url = 'http://'+self.monitorCenter.openFaaSGateway + '/system/functions'
@@ -145,3 +155,10 @@ class FuncMonitor:
     #     res = self.monitorCenter.promManager.query(
     #         query)['data'][0]['value'][1]
     #     return res
+
+
+if __name__ == "__main__":
+    print(os.getcwd())
+    monitorCenter = MonitorCenter('..\configs\monitor.yml')
+    funcMonitor = FuncMonitor(monitorCenter)
+    print(funcMonitor.get_kn_request_cnt('em-fn', '1m'))

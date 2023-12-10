@@ -10,12 +10,15 @@ if __name__ == '__main__':
     # 1. 从数据库中读取数据
 
     # 还有可能是serverful
-    type = 'serverless'
-    now_time = '2023-12-24 00:00:00'
-    # now_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))
+    type = 'serverful'
+    # now_time = '2023-12-24 00:00:00'
+    # localtime要-8h，不然会出现时区问题
+    now_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time() - 8 * 60 * 60))
+    print(f"now_time: {now_time}")
     # 获取15s前的时间
-    before_time = '2023-11-23 00:00:00'
-    # before_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time() - 15))
+    # before_time = '2023-11-23 00:00:00'
+    before_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time() - 8 * 60 * 60 - 20))
+    print(f"before_time: {before_time}")
 
     if type == 'serverless':
         sql = f"SELECT model_id, model_result, y_true \
