@@ -62,10 +62,27 @@ def your_function():
                     print("models数量不足3个，即使表现差也不用更新weight")
                     return
                 print("max_model_id没有变化，降至0")
+                # 获得这个model_id的weight
+                sql = f"SELECT \
+                            weight \
+                        FROM \
+                            models_weight \
+                        WHERE \
+                            model_id = {max_model_id};"
+                cursor.execute(sql)
+                # 获取结果
+                temp_weight = cursor.fetchone()
+
                 # 执行sql语句
                 sql = f"UPDATE models_weight \
                             SET weight = 0 \
                             WHERE model_id = {max_model_id};"
+                cursor.execute(sql)
+                conn.commit()
+                # 保持其他model的weight之和为1
+                sql = f"UPDATE models_weight \
+                            SET weight = weight + {float(temp_weight['weight']) / (num - 1)} \
+                            WHERE model_id <> {max_model_id};"
                 cursor.execute(sql)
                 conn.commit()
                 return
