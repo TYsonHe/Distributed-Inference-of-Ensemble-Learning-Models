@@ -51,7 +51,7 @@ def your_function():
                 # 无请求，不用计算精度
                 return
             elif temp <= 2.5 and TYPE == 'serverless':
-                print(f"{TIMERANGE}请求率过低,低于4, 不用计算精度")
+                print(f"{TIMERANGE}请求率过低,低于2.5, 不用计算精度")
                 # 无请求，不用计算精度
                 return
             else:
@@ -81,7 +81,7 @@ def your_function():
                 cursor.execute(sql)
                 # 获取结果
                 results = cursor.fetchall()
-                print(f"get results successfully")
+                # print(f"get results successfully")
 
                 result_dict = {}
                 for entry in results:
@@ -96,7 +96,7 @@ def your_function():
                     result_dict[model_id]['y_true'].append(float(y_true))
 
                 # 等会写入数据库要加上的time, 每轮计算精度的时间都要一致
-                create_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))
+                create_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time() - 8 * 60 * 60))
                 for model_id, result in result_dict.items():
                     model_results = result['model_results']
                     y_true = result['y_true']
@@ -117,6 +117,7 @@ def your_function():
                         conn.commit()
 
                 print('PrecisionSensor: precision is calculated and written to database.')
+                print(f'update time: {create_time}')
 
 
 
@@ -139,7 +140,7 @@ if __name__ == "__main__":
     scheduler = sched.scheduler(time.time, time.sleep)
 
     # 设置定时任务
-    interval = 60  # 间隔时间，单位为秒
+    interval = 60  # 间隔时间，单位为秒, 1分钟与下面TIMERANGE对应
     scheduler.enter(interval, 1, scheduler_func, (scheduler, interval, your_function))
 
     # 两个全局变量

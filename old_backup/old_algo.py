@@ -2,8 +2,8 @@ from utils.CrudDb import CrudDb
 from utils.DataLoader import DataLoader
 from utils.EnsembleModel import EnsembleModel
 from utils.FuncMonitor import FuncMonitor
-from utils.ModelSchedualingCenter.DynamicSelect import DynamicSelect
-from utils.ModelSchedualingCenter.DynamicWeight import DynamicWeight
+from old_backup.ModelSchedualingCenter import DynamicSelect
+from old_backup.ModelSchedualingCenter import DynamicWeight
 from utils.MonitorCenter.MonitorCenter import MonitorCenter
 from utils.PrecisionSensor.PrecisionSensor import PrecisionSensor
 
