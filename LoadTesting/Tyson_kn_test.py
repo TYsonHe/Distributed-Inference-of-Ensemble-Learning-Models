@@ -24,7 +24,7 @@ y_datas = y_processed_data.tolist()
 print(y_datas)
 y_datas_length = len(y_datas)
 
-invoke_data_path = "invoke_data.csv"
+invoke_data_path = "invoke_data2.csv"
 invoke_data = pd.read_csv(invoke_data_path, header=None)
 invoke_data_length = len(invoke_data)
 
@@ -79,8 +79,8 @@ class MyCustomShape(LoadTestShape):
                 return None
 
             user_count = int(invoke_data.at[index, 0])
-            if user_count > 10:
-                user_count = user_count // 10
+            # if user_count > 10:
+            #     user_count = user_count // 10
             return (user_count, self.spawn_rate)
         elif run_time < self.time_limit and not is_in_test_duration:
             return (0, self.spawn_rate)

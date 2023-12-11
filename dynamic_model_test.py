@@ -32,6 +32,9 @@ def your_function():
             # 获取结果
             results = cursor.fetchall()
             print(results)
+            if len(results) == 0:
+                print(f"{TIMERANGE}内无数据，不用更新weight")
+                return
 
             # 简单算法实现~
             # 按model_id计算mse的平均值
@@ -133,6 +136,8 @@ def your_function():
             # 获取结果
             model_weights = cursor.fetchall()
             print(f"更改后的model_weights: {model_weights}")
+            new_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time() - 8 * 60 * 60))
+            print(f"update_time: {new_time}")
 
 
     except Exception as e:
