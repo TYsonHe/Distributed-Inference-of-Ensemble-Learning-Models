@@ -24,7 +24,7 @@ def your_function():
                 monitor_center = MonitorCenter('.\configs\monitor.yml')
                 func_monitor = FuncMonitor(monitor_center)
                 # 注意类型转换
-                current_request_cnt = float(func_monitor.get_kn_request_cnt('em-fn', TIMERANGE))
+                current_request_cnt = float(func_monitor.getKnRequestCnt('em-fn', TIMERANGE))
                 temp = current_request_cnt
                 print(f"{TIMERANGE}内的请求率为: {temp}")
             else:
