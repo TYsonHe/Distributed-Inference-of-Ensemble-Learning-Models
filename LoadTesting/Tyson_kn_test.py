@@ -12,7 +12,7 @@ df = pd.read_csv(data_path, header=None)
 df = df.drop([0])
 processed_data = df.apply(lambda row: ','.join(map(str, row)), axis=1)
 datas = processed_data.tolist()
-print(datas)
+# print(datas)
 datas_length = len(datas)
 
 y_data_path = "../testDataSets/y_test.csv"
@@ -21,7 +21,7 @@ y_df = pd.read_csv(y_data_path, header=None)
 y_df = y_df.drop([0])
 y_processed_data = y_df.apply(lambda row: ','.join(map(str, row)), axis=1)
 y_datas = y_processed_data.tolist()
-print(y_datas)
+# print(y_datas)
 y_datas_length = len(y_datas)
 
 invoke_data_path = "invoke_data2.csv"
