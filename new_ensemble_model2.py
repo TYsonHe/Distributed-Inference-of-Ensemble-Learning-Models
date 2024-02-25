@@ -34,9 +34,7 @@ def process_request():
            FROM \
                 models \
            JOIN \
-                models_weight ON models.model_id = models_weight.model_id \
-           WHERE \
-                models_weight.weight > 0;"
+                models_weight ON models.model_id = models_weight.model_id;"
 
     cursor.execute(sql)
     # 4.获取结果
@@ -97,6 +95,26 @@ def process_request():
         # if new_response.status_code == 200:
         #     print('模型感知器接收成功')
 
+        # 1.获取模型信息
+        model_id = model['model_id']
+        model_name = model['model_name']
+        model_weight = model['model_weight']
+        model_type = model['model_type']
+        create_time = time.strftime(
+            '%Y-%m-%d %H:%M:%S', time.localtime(time.time()))
+        # 2.调用模型
+        url = 'http://10.60.150.177:32619/'
+        headers = {
+            'Host': f'{model_name}.knative-fn.knative.example.com ',
+            'Content-Type': 'text/plain',
+            'Accept': '*/*',
+            'Connection': 'keep-alive'
+        }
+        data = input_str
+        response = requests.request(
+            "POST", url=url, headers=headers, data=data)
+        # 3.获取模型返回结果
+        print(response.text)
     # 5.1 创建线程
     threads = []
     for model in models:
@@ -113,7 +131,7 @@ def process_request():
     ensemble_result = 0
     for result in results:
         ensemble_result += result['model_weight'] * \
-                           float(result['model_result'])
+            float(result['model_result'])
     # results.append({'ensemble_result': ensemble_result})
 
     print(results)

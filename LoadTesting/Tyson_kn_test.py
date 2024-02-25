@@ -1,9 +1,13 @@
 import pandas as pd
 import random
 import json
+import pendulum
 
 from locust import LoadTestShape, task, constant, HttpUser
+from utils.CrudDb import CrudDb
 
+db = CrudDb('../configs/db.yml')
+TIME_ZONE = 'UTC'
 # data_path="D:/CodingWork/git/Distributed-Inference-of-Ensemble-Learning-Models/testDataSets/stockPredict/dji_x_test_full.csv"
 data_path = "../testDataSets/X_test.csv"
 
@@ -30,14 +34,14 @@ invoke_data_length = len(invoke_data)
 
 # 所有的时间单位都是秒
 pressure_test_interval = 3  # 每两个并发的间隔时间
-single_test_duration = 30  # 一批次压测时间
-single_stop_duration = 15  # 一批次停止压测时间
+single_test_duration = 60  # 一批次压测时间
+single_stop_duration = 30  # 一批次停止压测时间
 max_request_time = 20  # 预估一个请求的最大时间,用于限制压测的执行时长
 
 
 class MyUser(HttpUser):
     wait_time = constant(1)
-    host = "http://10.60.150.177:32619"  # 设置主机地址
+    host = "http://10.60.150.177:32361"  # 设置主机地址
 
     def on_start(self):
         self.headers = {
@@ -54,7 +58,16 @@ class MyUser(HttpUser):
             "y_true": y_datas[random_number]
         })
         response = self.client.post('/', headers=self.headers, data=data)
-        print(f"Response status code: {response.status_code}")
+        # print(f"Response status code: {response.status_code}")
+
+    # def on_stop(self):
+    #     pass
+    #     # super().on_stop()
+    #     # end_time = time.time()  # 记录压测结束时间
+    #     # elapsed_time = end_time - self.start_time  # 计算压测持续时间
+    #     # print(f"Total time of this period: {elapsed_time} seconds")
+    #     # total_rps = self.environment.runner.stats.total_rps()  # 整个压测期间的每秒请求数
+    #     # print(f"Total RPS during this period: {total_rps}")
 
 
 # 启动策略：逐步负载策略每隔30秒新增启动10个用户
@@ -68,7 +81,6 @@ class MyCustomShape(LoadTestShape):
 
     def tick(self):
         run_time = self.get_run_time()
-
         # 需要看当前时间是否在压测的时间段内
         is_in_test_duration = (run_time % (single_test_duration + single_stop_duration)) < single_test_duration
 
@@ -79,6 +91,10 @@ class MyCustomShape(LoadTestShape):
                 return None
 
             user_count = int(invoke_data.at[index, 0])
+            create_time = pendulum.now(TIME_ZONE)
+            print(f"Current time: {create_time}, user count: {user_count}")
+            sql = f"insert into request_cnt(create_time, request_cnt) values('{create_time}', {user_count})"
+            db.CreateData(sql)
             # if user_count > 10:
             #     user_count = user_count // 10
             return (user_count, self.spawn_rate)
