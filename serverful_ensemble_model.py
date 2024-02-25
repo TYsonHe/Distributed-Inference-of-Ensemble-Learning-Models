@@ -44,9 +44,7 @@ def process_request():
            FROM \
 		       svc_models \
            JOIN \
-		       svc_models_weight ON svc_models.model_id = svc_models_weight.model_id \
-           WHERE \
-		       svc_models_weight.weight > 0;"
+		       svc_models_weight ON svc_models.model_id = svc_models_weight.model_id;"
 
     cursor.execute(sql)
     models = cursor.fetchall()
@@ -91,7 +89,7 @@ def process_request():
     ensemble_result = 0
     for result in results:
         ensemble_result += result['model_weight'] * \
-                           float(result['model_result'])
+            float(result['model_result'])
 
     # 将集成模型结果送入数据库
 
